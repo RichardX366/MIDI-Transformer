@@ -24,19 +24,19 @@ def loadFile(file):
 
 
 def tokenize_function(s):
-    return tokenizer(s, padding="max_length", truncation=True)
+    return tokenizer(s["text"], padding="max_length", truncation=True)
 
 
-rawData = list(map(loadFile, listdir("data")))
+rawData = []
 
-train_dataset = Dataset.from_list(rawData[: floor(len(rawData) * 0.8)]).map(
-    tokenize_function, batched=True
-)
+for file in listdir("data"):
+    text = loadFile(file)
+    text.update(tokenize_function(text))
+    rawData.append(text)
 
-test_dataset = Dataset.from_list(rawData[floor(len(rawData) * 0.8) :]).map(
-    tokenize_function, batched=True
-)
+unsplit_dataset = Dataset.from_list(rawData)
 
+dataset = unsplit_dataset.train_test_split(test_size=0.2)
 
 model = AutoModelForNextSentencePrediction.from_pretrained(
     "google-bert/bert-base-cased"
@@ -56,9 +56,9 @@ def compute_metrics(eval_pred):
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=train_dataset,
-    eval_dataset=test_dataset,
+    train_dataset=dataset["train"],
+    eval_dataset=dataset["test"],
     compute_metrics=compute_metrics,
 )
 
-print(dataset["train"][0])
+trainer.train()
