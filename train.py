@@ -1,4 +1,3 @@
-from math import floor
 from transformers import (
     AutoTokenizer,
     AutoModelForNextSentencePrediction,
