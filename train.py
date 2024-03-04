@@ -1,6 +1,6 @@
 from transformers import (
     AutoTokenizer,
-    AutoModelForSequenceClassification,
+    AutoModelForNextSentencePrediction,
     TrainingArguments,
     Trainer,
 )
@@ -37,7 +37,7 @@ unsplit_dataset = Dataset.from_list(rawData)
 
 dataset = unsplit_dataset.train_test_split(test_size=0.2)
 
-model = AutoModelForSequenceClassification.from_pretrained(
+model = AutoModelForNextSentencePrediction.from_pretrained(
     "google-bert/bert-base-cased"
 )
 
